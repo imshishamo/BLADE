@@ -86,6 +86,7 @@ void insertHelper(Entry<K, V>* entry, const K& key, BinaryTreeNode<K, V>* node);
 
 BinaryTreeNode<K, V>* findHelper(const K& key, BinaryTreeNode<K, V>* node);
 BinaryTreeNode<K, V>* findRightMin(BinaryTreeNode<K, V>* node);
+void deleteTree(BinaryTreeNode<K, V>* node);
 
 };
 

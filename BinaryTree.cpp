@@ -3,8 +3,9 @@ using namespace std;
 
 template<typename K, typename V>
 BinaryTree<K, V>::BinaryTree() {
+    root=NULL;
+    tsize=0;
     makeEmpty();
-    cout << "G" << endl;
 }
 
 /**
@@ -244,7 +245,7 @@ void BinaryTree<K, V>::remove(const K& key) {
             else if(node->leftChild!=NULL && node->rightChild!=NULL){
                 BinaryTreeNode<K, V>* right_min = findRightMin(node->rightChild);
                 Entry<K, V>* entry = new Entry<K, V>(Integer(right_min->entry->getkey().getvalue()), String(right_min->entry->getvalue().getvalue()));
-                BinaryTreeNode<K, V>* new_node = new BinaryTreeNode<K, V>(entry); 
+                BinaryTreeNode<K, V>* new_node = new BinaryTreeNode<K, V>(entry);
                 //node是老爸的左邊兒子
                 if(node->entry->getkey().getvalue() <= parent_node->entry->getkey().getvalue()){
                     //Step1. 處理parent<->new_node
@@ -302,7 +303,7 @@ void BinaryTree<K, V>::remove(const K& key) {
                         right_min->rightChild=NULL;
                     }
                 }
-                free(right_min);
+                free(right_min); 
             }
         }
         
@@ -323,7 +324,22 @@ BinaryTreeNode<K, V>* BinaryTree<K, V>::findRightMin(BinaryTreeNode<K, V>* node)
  */
 template<typename K, typename V>
 void BinaryTree<K, V>::makeEmpty() {
-    root = NULL;
+    deleteTree(root);
+}
+
+template<typename K, typename V>
+void BinaryTree<K, V>::deleteTree(BinaryTreeNode<K, V>* node){
+    if (root == nullptr) {
+        return; // 如果節點為空，直接返回
+    }
+    // 遞歸刪除左子樹
+    deleteTree(root->leftChild);
+    // 遞歸刪除右子樹
+    deleteTree(root->rightChild);
+    // 釋放當前節點
+    delete root;
+    // 將指標設為 NULL
+    root = nullptr;
     tsize=0;
 }
 
