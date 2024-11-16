@@ -1,2 +1,2 @@
 # Blade
-Binary Linked Advanced Data Engineered with C++
+**B**inary **L**inked **A**dvanced **D**ata **E**ngineered with C++
