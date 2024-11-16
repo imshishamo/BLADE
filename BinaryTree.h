@@ -70,6 +70,7 @@ virtual Entry<K,V>* find(const K& key);
  */
 virtual void remove(const K& key);
 
+
 /**
  *  Remove all entries from the dictionary.
  */
@@ -84,6 +85,7 @@ private:
 void insertHelper(Entry<K, V>* entry, const K& key, BinaryTreeNode<K, V>* node);
 
 BinaryTreeNode<K, V>* findHelper(const K& key, BinaryTreeNode<K, V>* node);
+BinaryTreeNode<K, V>* findRightMin(BinaryTreeNode<K, V>* node);
 
 };
 

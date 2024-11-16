@@ -31,11 +31,11 @@ bool BinaryTree<K, V>::isEmpty() {
 template<typename K, typename V>
 void BinaryTree<K, V>::insertHelper(Entry<K, V>* entry, const K& key, BinaryTreeNode<K, V>* node) {
     if (key.compareTo(node->entry->getkey()) <= 0) {
-    if (node->leftChild == NULL) {
-        node->leftChild = new BinaryTreeNode<K, V>(entry, node);
-    } else {
-        insertHelper(entry, key, node->leftChild);
-    }
+        if (node->leftChild == NULL) {
+            node->leftChild = new BinaryTreeNode<K, V>(entry, node);
+        } else {
+            insertHelper(entry, key, node->leftChild);
+        }
     } else {
         if (node->rightChild == NULL) {
             node->rightChild = new BinaryTreeNode<K, V>(entry, node);
@@ -74,7 +74,22 @@ void BinaryTree<K, V>::insert(const K& key, const V& value) {
  **/
 template<typename K, typename V>
 BinaryTreeNode<K, V>* BinaryTree<K, V>::findHelper(const K& key, BinaryTreeNode<K, V>* node) {
-// Replace the following line with your solution.
+    if (key.compareTo(node->entry->getkey()) < 0) {
+        if (node->leftChild == NULL) {
+            return NULL;
+        } else {
+            return findHelper(key, node->leftChild);
+        }
+    } else if (key.compareTo(node->entry->getkey()) > 0){
+        if (node->rightChild == NULL) {
+            return NULL;
+        } else {
+            return findHelper(key, node->rightChild);
+        }
+    }
+    else if (key.compareTo(node->entry->getkey()) == 0) {
+        return node;
+    }
     return NULL;
 }
 
@@ -106,7 +121,201 @@ Entry<K, V>* BinaryTree<K, V>::find(const K& key) {
  */
 template<typename K, typename V>
 void BinaryTree<K, V>::remove(const K& key) {
-    // Your solution here.
+    BinaryTreeNode<K, V>* node = findHelper(key, root);
+    BinaryTreeNode<K, V>* parent_node = node->parent;
+    if (node != NULL) {
+        tsize--;
+        if (parent_node==NULL){
+            //Case1. node沒有兒子 (這個node是root)
+            if(node->leftChild==NULL && node->rightChild==NULL){
+                node=NULL;
+            }
+            //Case2. node有左兒子 (這個node是root)
+            else if(node->leftChild!=NULL && node->rightChild==NULL){
+                root=node->leftChild;
+                node->leftChild->parent=NULL;
+                node->leftChild=NULL;
+                free(node);
+            }
+            //Case3. node有右兒子 (這個node是root)
+            else if(node->leftChild==NULL && node->rightChild!=NULL){
+                root=node->rightChild;
+                node->rightChild->parent=NULL;
+                node->rightChild=NULL;
+                free(node);
+            }
+            // Case4. node有左兒子&右兒子 (這個node是root)
+            else if(node->leftChild!=NULL && node->rightChild!=NULL){
+                BinaryTreeNode<K, V>* right_min = findRightMin(node->rightChild);
+                Entry<K, V>* entry = new Entry<K, V>(Integer(right_min->entry->getkey().getvalue()), String(right_min->entry->getvalue().getvalue()));
+                BinaryTreeNode<K, V>* new_node = new BinaryTreeNode<K, V>(entry);
+                root = new_node;
+                new_node->leftChild=node->leftChild;
+                node->leftChild->parent=new_node;
+                node->leftChild=NULL;
+                new_node->rightChild=node->rightChild;
+                node->rightChild->parent=new_node;
+                node->rightChild=NULL;
+                free(node);
+                // 刪節點 情形一:right_min沒有兒子
+                if (right_min->rightChild==NULL){
+                    if(right_min->entry->getkey().getvalue() <= right_min->parent->entry->getkey().getvalue()){
+                        right_min->parent->leftChild=NULL;
+                        right_min->parent=NULL;
+                    }
+                    else{
+                        right_min->parent->rightChild=NULL;
+                        right_min->parent=NULL;
+                    }
+                }
+                // 刪節點 情形二:right_min有右兒子
+                else{
+                    if(right_min->entry->getkey().getvalue() <= right_min->parent->entry->getkey().getvalue()){
+                        right_min->parent->leftChild=right_min->rightChild;
+                        right_min->rightChild->parent=right_min->parent;
+                        right_min->parent=NULL;
+                        right_min->rightChild=NULL;
+                    }
+                    else{
+                        right_min->parent->rightChild=right_min->rightChild;
+                        right_min->rightChild->parent=right_min->parent;
+                        right_min->parent=NULL;
+                        right_min->rightChild=NULL;
+                    }
+                }
+                free(right_min);
+            }
+        }else{
+            //Case1. node沒有兒子
+            if(node->leftChild==NULL && node->rightChild==NULL){
+                //node是老爸的左邊兒子
+                if(node->entry->getkey().getvalue() <= parent_node->entry->getkey().getvalue()){
+                    parent_node->leftChild=NULL;
+                    node->parent=NULL;
+                }
+                else{
+                    parent_node->rightChild=NULL;
+                    node->parent=NULL;
+                }
+                free(node);
+                return;
+            }
+            //Case2. node有左兒子
+            else if(node->leftChild!=NULL && node->rightChild==NULL){
+                BinaryTreeNode<K, V>* left_node = node->leftChild;
+                //node是老爸的左邊兒子
+                if(node->entry->getkey().getvalue() <= parent_node->entry->getkey().getvalue()){
+                    parent_node->leftChild=left_node;
+                    left_node->parent=parent_node;
+                    node->parent=NULL;
+                    node->leftChild=NULL;
+                }
+                //node是老爸的右邊兒子
+                else{
+                    parent_node->rightChild=left_node;
+                    left_node->parent=parent_node;
+                    node->parent=NULL;
+                    node->leftChild=NULL;
+                }
+                free(node);
+                return;
+            }
+            //Case3. node有右兒子
+            else if(node->leftChild==NULL && node->rightChild!=NULL){
+                BinaryTreeNode<K, V>* right_node = node->rightChild;
+                //node是老爸的左邊兒子
+                if(node->entry->getkey().getvalue() <= parent_node->entry->getkey().getvalue()){
+                    parent_node->leftChild=right_node;
+                    right_node->parent=parent_node;
+                    node->parent=NULL;
+                    node->rightChild=NULL;
+                }
+                //node是老爸的右邊兒子
+                else{
+                    parent_node->rightChild=right_node;
+                    right_node->parent=parent_node;
+                    node->parent=NULL;
+                    node->rightChild=NULL;
+                }
+                free(node);
+                return;
+            }
+            // Case4. node有左兒子&右兒子
+            else if(node->leftChild!=NULL && node->rightChild!=NULL){
+                BinaryTreeNode<K, V>* right_min = findRightMin(node->rightChild);
+                Entry<K, V>* entry = new Entry<K, V>(Integer(right_min->entry->getkey().getvalue()), String(right_min->entry->getvalue().getvalue()));
+                BinaryTreeNode<K, V>* new_node = new BinaryTreeNode<K, V>(entry);
+                //node是老爸的左邊兒子
+                if(node->entry->getkey().getvalue() <= parent_node->entry->getkey().getvalue()){
+                    //Step1. 處理parent<->new_node
+                    parent_node->leftChild=new_node;
+                    new_node->parent=parent_node;
+                    node->parent=NULL;
+                    //Step2. 處理leftChild<->new_node
+                    new_node->leftChild=node->leftChild;
+                    node->leftChild->parent=new_node;
+                    node->leftChild=NULL;
+                    //Step3. 處理rightChild<->new_node
+                    new_node->rightChild=node->rightChild;
+                    node->rightChild->parent=new_node;
+                    node->rightChild=NULL;
+                }
+                //node是老爸的右邊兒子
+                else{
+                    //Step1. 處理parent<->new_node
+                    parent_node->rightChild=new_node;
+                    new_node->parent=parent_node;
+                    node->parent=NULL;
+                    //Step2. 處理leftChild<->new_node
+                    new_node->leftChild=node->leftChild;
+                    node->leftChild->parent=new_node;
+                    node->leftChild=NULL;
+                    //Step3. 處理rightChild<->new_node
+                    new_node->rightChild=node->rightChild;
+                    node->rightChild->parent=new_node;
+                    node->rightChild=NULL;
+                }
+                free(node);
+                // 刪節點 情形一:right_min沒有兒子
+                if (right_min->rightChild==NULL){
+                    if(right_min->entry->getkey().getvalue() <= right_min->parent->entry->getkey().getvalue()){
+                        right_min->parent->leftChild=NULL;
+                        right_min->parent=NULL;
+                    }
+                    else{
+                        right_min->parent->rightChild=NULL;
+                        right_min->parent=NULL;
+                    }
+                }
+                // 刪節點 情形二:right_min有右兒子
+                else{
+                    if(right_min->entry->getkey().getvalue() <= right_min->parent->entry->getkey().getvalue()){
+                        right_min->parent->leftChild=right_min->rightChild;
+                        right_min->rightChild->parent=right_min->parent;
+                        right_min->parent=NULL;
+                        right_min->rightChild=NULL;
+                    }
+                    else{
+                        right_min->parent->rightChild=right_min->rightChild;
+                        right_min->rightChild->parent=right_min->parent;
+                        right_min->parent=NULL;
+                        right_min->rightChild=NULL;
+                    }
+                }
+                free(right_min);
+            }
+        }
+        
+    }
+}
+
+template<typename K, typename V>
+BinaryTreeNode<K, V>* BinaryTree<K, V>::findRightMin(BinaryTreeNode<K, V>* node) {
+    // 右邊已經沒有其他節點 是最大值
+    if(node->leftChild==NULL){
+        return node;
+    }
+    return findRightMin(node->leftChild);
 }
 
 /**
@@ -114,8 +323,8 @@ void BinaryTree<K, V>::remove(const K& key) {
  */
 template<typename K, typename V>
 void BinaryTree<K, V>::makeEmpty() {
-    // Your solution here.
-
+    root = NULL;
+    tsize=0;
 }
 
 /**
