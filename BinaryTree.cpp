@@ -325,22 +325,22 @@ BinaryTreeNode<K, V>* BinaryTree<K, V>::findRightMin(BinaryTreeNode<K, V>* node)
 template<typename K, typename V>
 void BinaryTree<K, V>::makeEmpty() {
     deleteTree(root);
+    root = NULL;
+    tsize=0;
 }
 
 template<typename K, typename V>
 void BinaryTree<K, V>::deleteTree(BinaryTreeNode<K, V>* node){
-    if (root == nullptr) {
+    if (node == NULL) {
         return; // 如果節點為空，直接返回
     }
     // 遞歸刪除左子樹
-    deleteTree(root->leftChild);
+    deleteTree(node->leftChild);
     // 遞歸刪除右子樹
-    deleteTree(root->rightChild);
+    deleteTree(node->rightChild);
     // 釋放當前節點
-    delete root;
+    delete node;
     // 將指標設為 NULL
-    root = nullptr;
-    tsize=0;
 }
 
 /**
