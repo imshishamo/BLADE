@@ -159,7 +159,7 @@ void BinaryTree<K, V>::remove(const K& key) {
                 free(node);
                 // 刪節點 情形一:right_min沒有兒子
                 if (right_min->rightChild==NULL){
-                    if(right_min->entry->getkey().getvalue() <= right_min->parent->entry->getkey().getvalue()){
+                    if(right_min->entry->getkey().getvalue() < right_min->parent->entry->getkey().getvalue()){
                         right_min->parent->leftChild=NULL;
                         right_min->parent=NULL;
                     }
@@ -170,7 +170,7 @@ void BinaryTree<K, V>::remove(const K& key) {
                 }
                 // 刪節點 情形二:right_min有右兒子
                 else{
-                    if(right_min->entry->getkey().getvalue() <= right_min->parent->entry->getkey().getvalue()){
+                    if(right_min->entry->getkey().getvalue() < right_min->parent->entry->getkey().getvalue()){
                         right_min->parent->leftChild=right_min->rightChild;
                         right_min->rightChild->parent=right_min->parent;
                         right_min->parent=NULL;
@@ -244,7 +244,7 @@ void BinaryTree<K, V>::remove(const K& key) {
             else if(node->leftChild!=NULL && node->rightChild!=NULL){
                 BinaryTreeNode<K, V>* right_min = findRightMin(node->rightChild);
                 Entry<K, V>* entry = new Entry<K, V>(Integer(right_min->entry->getkey().getvalue()), String(right_min->entry->getvalue().getvalue()));
-                BinaryTreeNode<K, V>* new_node = new BinaryTreeNode<K, V>(entry);
+                BinaryTreeNode<K, V>* new_node = new BinaryTreeNode<K, V>(entry); 
                 //node是老爸的左邊兒子
                 if(node->entry->getkey().getvalue() <= parent_node->entry->getkey().getvalue()){
                     //Step1. 處理parent<->new_node
@@ -278,7 +278,7 @@ void BinaryTree<K, V>::remove(const K& key) {
                 free(node);
                 // 刪節點 情形一:right_min沒有兒子
                 if (right_min->rightChild==NULL){
-                    if(right_min->entry->getkey().getvalue() <= right_min->parent->entry->getkey().getvalue()){
+                    if(right_min->entry->getkey().getvalue() < right_min->parent->entry->getkey().getvalue()){
                         right_min->parent->leftChild=NULL;
                         right_min->parent=NULL;
                     }
@@ -289,7 +289,7 @@ void BinaryTree<K, V>::remove(const K& key) {
                 }
                 // 刪節點 情形二:right_min有右兒子
                 else{
-                    if(right_min->entry->getkey().getvalue() <= right_min->parent->entry->getkey().getvalue()){
+                    if(right_min->entry->getkey().getvalue() < right_min->parent->entry->getkey().getvalue()){
                         right_min->parent->leftChild=right_min->rightChild;
                         right_min->rightChild->parent=right_min->parent;
                         right_min->parent=NULL;
